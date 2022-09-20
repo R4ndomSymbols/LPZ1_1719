@@ -15,9 +15,11 @@ var tdate = new DateTime(2001, 01, 12);
 
 // variant 1
 
+// использование оператора new гарантирует, что ссылки объектов разнятся
 var testP1 = new Person("Erick", "Evans", new DateTime(1970, 10, 12));
 var testP2 = new Person("Erick", "Evans", new DateTime(1970, 10, 12));
 
+Console.WriteLine("Ссылки на объекты " + (object.ReferenceEquals(testP1, testP2) ? "равны" : "не равны"));
 Console.WriteLine($"{nameof(testP1)} и {nameof(testP2)} " + (testP2.Equals(testP1) ? "равны" : "не равны"));
 Console.WriteLine($"{nameof(testP1)} hash: {testP1.GetHashCode()}\n{nameof(testP2)} hash: {testP2.GetHashCode()}" );
 
@@ -31,9 +33,15 @@ student.Exams = new System.Collections.ArrayList() {
 };
 
 student.Tests = new System.Collections.ArrayList() {
-new Test("euler_theory", true),
-new Test("advanced_russian", false),
-new Test("country_acknowledge_test", true)
+new Test("math", true),
+new Test("russian", false),
+new Test("country_acknowledge_test", true),
+new Test("russian", true),
+new Test("country_acknowledge_test", true),
+new Test("geography", true),
+new Test("russian", false),
+new Test("math", false),
+new Test("chenese", true)
 };
 
 Console.WriteLine(student.AboutIndividual.ToString());
@@ -43,8 +51,8 @@ var secondStudent = student.DeepCopy();
 student.Name = "NonErick";
 student.Tests.Add(new Test("DoesNotExist", true));
 
-Console.WriteLine(student);
-Console.WriteLine(secondStudent);
+Console.WriteLine("исходный измененный объект: \n" + student);
+Console.WriteLine("копированный объект: \n" + secondStudent);
 try
 {
     student.GroupNumber = int.MaxValue;
@@ -54,19 +62,29 @@ catch (ArgumentOutOfRangeException e)
     Console.WriteLine("\n" + e.Message);
 }
 
-foreach (var obj in student.EnumerateExamsAndTests())
+Console.WriteLine("\nсписок тестов и экзаменов (изменен с учетом реализации итератора)\n");
+foreach (var obj in student)
 {
-    Console.WriteLine("\n" + obj.ToString());
+    Console.WriteLine(obj.ToString());
 }
-
+Console.WriteLine("\nсписок экзаменов с оценкой выше тройки\n");
 foreach (var exam in student.EnumerateExams(3))
 {
-    Console.WriteLine("\n" + exam.ToString());
+    Console.WriteLine(exam.ToString());
+}
+Console.WriteLine("\nсписок сданных экзаменов и тестов\n");
+foreach (var exam in student.EnumerateSuccessExamsAndTests())
+{
+    Console.WriteLine(exam.ToString());
+}
+Console.WriteLine("\nсписок тестов, для которых сдан экзамен\n");
+foreach (var exam in student.EnumerateTestsWhereExamIsPassed())
+{
+    Console.WriteLine(exam.ToString());
 }
 
-//Console.WriteLine(student);
 
-//Console.WriteLine(CheckArraysTimes<Student>(1000, 100, nameof(student.GroupNumber), 1000));
+
 
 // additional methods
 

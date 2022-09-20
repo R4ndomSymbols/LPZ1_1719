@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LPZ1_1719
 {
-    public class Test
+    public class Test 
     {
         public string Name { get; set; }
         public bool IsPassed { get; set; }
@@ -24,7 +24,7 @@ namespace LPZ1_1719
 
         public override string ToString()
         {
-            return String.Join(" ", Name, IsPassed);
+            return String.Join(" ", Name, IsPassed ? "сдан" : "не сдан");
         }
     }
 }

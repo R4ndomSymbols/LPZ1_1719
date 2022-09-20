@@ -8,19 +8,18 @@ using LPZ1_1719.Lpz2;
 
 namespace LPZ1_1719
 {
-    public class Student : Person
+    public class Student : Person, IEnumerable
     {
         private Education _education;
         private int _groupNumber;
         private ArrayList _exams;
         private ArrayList _tests;
 
-        public Person AboutIndividual { get => (Person)((Person)this).DeepCopy(); set 
+        public Person AboutIndividual { get => (Person)base.DeepCopy(); set 
             { 
                 Name = new string(value.Name);
                 Surname = new string(value.Surname);
                 Birthday = value.Birthday;
-
             } 
         }
         public Education Education { get => _education; set => _education = value; }
@@ -84,18 +83,72 @@ namespace LPZ1_1719
             var temporaryCollection = new ArrayList();
             temporaryCollection.AddRange(_tests);
             temporaryCollection.AddRange(_exams);
-            for (int i = 0; i < _exams.Count; i++)
+            for (int i = 0; i < temporaryCollection.Count; i++)
             {
                 yield return temporaryCollection[i];
             }
         }
+
+        public IEnumerable<Test> EnumerateTestsWhereExamIsPassed()
+        {
+            var exams = this.EnumerateExams(2);
+            var tests = this.EnumerateTests(true);
+
+            foreach (var test in tests)
+            {
+                if(exams.Any(x => x.Subject == test.Name))
+                {
+                    yield return test;
+                }             
+            }
+        }
+
+        public IEnumerable<object> EnumerateSuccessExamsAndTests()
+        {
+            foreach(var t in this)
+            {
+                if (t is Exam exam)
+                {
+                    if (exam.Mark > 2)
+                    {
+                        yield return t;
+                    }
+                }
+                else
+                {
+                    if (((Test)t).IsPassed)
+                    {
+                        yield return t;
+                    }
+                }
+            }
+        }
+
+
         public IEnumerable<Exam> EnumerateExams(int minMark)
         {
-            var selected = _exams.ToArray().Cast<Exam>().Where(exam => exam.Mark > minMark).ToArray();
-            
-            for (int i = 0; i < selected.Count(); i++)
+            foreach(var t in this)
             {
-                yield return selected[i];
+                if(t is Exam e)
+                {
+                    if(e.Mark > minMark)
+                    {
+                        yield return e;
+                    }
+                }
+            }
+        }
+        public IEnumerable<Test> EnumerateTests(bool isPassed)
+        {
+            foreach (var t in this)
+            {
+                if (t is Test tt)
+                {
+                    if (tt.IsPassed == isPassed)
+                    {
+                        yield return tt;
+                    }
+                }
             }
         }
 
@@ -119,8 +172,58 @@ namespace LPZ1_1719
             return std;
         }
 
+        public IEnumerator GetEnumerator()
+        {
+            var t = new ArrayList(_tests);
+            t.AddRange(_exams);
+            return new StudentEnumerator(t);
+        }
 
 
 
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+    public class StudentEnumerator : IEnumerator
+    {
+        public ArrayList _testsAndExams;
+        private int position = -1;
+        public object Current
+        {
+            get
+            {
+                try
+                {
+                    return _testsAndExams[position];
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+        }
+
+
+        public StudentEnumerator(ArrayList testsAndExams)
+        {
+            _testsAndExams = testsAndExams;
+        }
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool MoveNext()
+        {
+            position++;
+            return position < _testsAndExams.Count;
+        }
+
+        public void Reset()
+        {
+            position = -1;
+        }
     }
 }
