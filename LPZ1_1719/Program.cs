@@ -15,62 +15,58 @@ var tdate = new DateTime(2001, 01, 12);
 
 // variant 1
 
-var student = new Student(originalPerson, Education.Specialist, 100);
+var testP1 = new Person("Erick", "Evans", new DateTime(1970, 10, 12));
+var testP2 = new Person("Erick", "Evans", new DateTime(1970, 10, 12));
 
-Console.WriteLine(student.ToShortString());
+Console.WriteLine($"{nameof(testP1)} и {nameof(testP2)} " + (testP2.Equals(testP1) ? "равны" : "не равны"));
+Console.WriteLine($"{nameof(testP1)} hash: {testP1.GetHashCode()}\n{nameof(testP2)} hash: {testP2.GetHashCode()}" );
 
-WriteEnum(typeof(Education));
+var student = new Student(testP1, Education.Specialist, 100);
 
-student.Education = Education.Bachelor;
-student.AboutIndividual = secondPerson;
-student.Exams = new Exam[] { new Exam("russian", 5, tdate) };
-student.GroupNumber = 20;
+student.Exams = new System.Collections.ArrayList() {
+    new Exam("math", 5, new DateTime(1985, 12, 26)),
+    new Exam("russian", 4, new DateTime(1985, 12, 27)),
+    new Exam("geography", 5, new DateTime(1985, 12, 28)),
+    new Exam("chinese", 3, new DateTime(1985, 12, 28))
+};
 
-student.AddExams(new Exam("math", 5, fdate), new Exam("philosophy", 4, sdate));
+student.Tests = new System.Collections.ArrayList() {
+new Test("euler_theory", true),
+new Test("advanced_russian", false),
+new Test("country_acknowledge_test", true)
+};
+
+Console.WriteLine(student.AboutIndividual.ToString());
+
+var secondStudent = student.DeepCopy();
+
+student.Name = "NonErick";
+student.Tests.Add(new Test("DoesNotExist", true));
 
 Console.WriteLine(student);
+Console.WriteLine(secondStudent);
+try
+{
+    student.GroupNumber = int.MaxValue;
+}
+catch (ArgumentOutOfRangeException e)
+{
+    Console.WriteLine("\n" + e.Message);
+}
 
-Console.WriteLine(CheckArraysTimes<Student>(1000, 100, nameof(student.GroupNumber), 1000));
+foreach (var obj in student.EnumerateExamsAndTests())
+{
+    Console.WriteLine("\n" + obj.ToString());
+}
 
-//variant 2
+foreach (var exam in student.EnumerateExams(3))
+{
+    Console.WriteLine("\n" + exam.ToString());
+}
 
-var magazine = new Magazine("journal", Frequency.Monthly, tdate, 10000);
+//Console.WriteLine(student);
 
-Console.WriteLine(magazine.ToShortString());
-
-WriteEnum(typeof(Frequency));
-
-magazine.Articles = new Article[] { new Article(originalPerson, "reol_album", 15000) };
-magazine.Circulation = 10000;
-magazine.Name = "best_songs_of_the_year";
-magazine.DateOfPublishing = tdate;
-magazine.Frequency = Frequency.Yearly;
-
-magazine.AddArtiles(new Article(originalPerson, "noTitle", 3), new Article(secondPerson,"C# programming guide", 500));
-
-Console.WriteLine(magazine);
-
-Console.WriteLine(CheckArraysTimes<Magazine>(1000, 100, nameof(magazine.Name), "noname"));
-
-// variant 3
-
-var researchTeam = new ResearchTeam("nuclear syntesis", TimeFrame.Long, "ITER", 132342);
-
-Console.WriteLine(researchTeam.ToShortString());
-
-WriteEnum(typeof(TimeFrame));
-
-researchTeam.NameOfOrganisation = "ITER_";
-researchTeam.Duration = TimeFrame.TwoYears;
-researchTeam.NameOfResearch = "magnetism";
-researchTeam.Papers = new Paper[] { new Paper(secondPerson, "10000 Ampers", fdate) };
-researchTeam.RegistrationNumber = 194375;
-
-researchTeam.AddPapers(new Paper(originalPerson, "100000 ampere", sdate));
-
-Console.WriteLine(researchTeam);
-
-Console.WriteLine(CheckArraysTimes<ResearchTeam>(1000, 100, nameof(researchTeam.NameOfResearch), "nonameres"));
+//Console.WriteLine(CheckArraysTimes<Student>(1000, 100, nameof(student.GroupNumber), 1000));
 
 // additional methods
 

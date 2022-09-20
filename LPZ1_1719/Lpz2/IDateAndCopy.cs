@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LPZ1_1719
+namespace LPZ1_1719.Lpz2
 {
-    public enum Frequency
+    public interface IDateAndCopy
     {
-        Weekly,
-        Monthly,
-        Yearly
+        object DeepCopy();
+
+        DateTime Date { get; set; }
     }
 }
